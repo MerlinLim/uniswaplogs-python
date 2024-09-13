@@ -20,20 +20,19 @@ async def subscribe_to_uniswap_events():
             ]
         }
 
-        print(f"Using filter params:{filter_params}")
         subscription_id = await w3.eth.subscribe("logs", filter_params)
-        print(f"Subscribing to new heads at {subscription_id}")
+        print(f"Subscribing to swap events from swap router with id {subscription_id}")
 
         async for response in w3.socket.process_subscriptions():
-            print(f"{response}\n")
             result = response['result']
-
+            tx_hash = HexBytes(result['transactionHash']).hex()
             from_addr = decode(["address"], result["topics"][1])[0]
             to_addr = decode(["address"], result["topics"][2])[0]
             data = decode("int256,int256,uint160,uint128,int24".split(","), result["data"], strict=False)
 
-            print(f"swapping from {from_addr} to {to_addr}")
-            print(f"Raw data: {data}")
+            print(f"Transaction hash '0x{tx_hash}'")
+            print(f"   Swapping from {from_addr} to {to_addr}")
+            print(f"   Raw data: {data}\n")
 
 async def subscribe_to_uniswap_events_via_contract():
 
